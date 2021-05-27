@@ -1,8 +1,3 @@
-defmodule Bmp3xxTest do
+defmodule BMP3XXTest do
   use ExUnit.Case
-  doctest Bmp3xx
-
-  test "greets the world" do
-    assert Bmp3xx.hello() == :world
-  end
 end
