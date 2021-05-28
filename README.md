@@ -18,7 +18,7 @@ iex> {:ok, bmp} = BMP3XX.start_link(bus_name: "i2c-1", bus_address: 0x77)
 {:ok, #PID<0.2190.0>}
 iex> BMP3XX.measure(bmp)
 {:ok,
- %BMP3XX.BMP388.Measurement{
+ %BMP3XX.Measurement{
    altitude_m: 100.11370638569619,
    pressure_pa: 100387.23387754142,
    temperature_c: 30.542875839950284,
@@ -27,7 +27,7 @@ iex> BMP3XX.measure(bmp)
 ```
 
 Depending on your hardware configuration, you may need to modify the call to
-`BMP3XX.start_link/1`. See `t:BMP3XX.options/0` for parameters.
+[`BMP3XX.start_link/1`](https://hexdocs.pm/bmp3xx/BMP3XX.html#start_link/1). See [`t:BMP3XX.options/0`](https://hexdocs.pm/bmp3xx/BMP3XX.html#t:options/0) for parameters.
 
 All measurements are reported in SI units.
 
