@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.2
+
+* Fixes
+  * Remove default gen server name (previously defaulted to `__MODULE__`)
+
 ## v0.1.1
 
 * Improvements
