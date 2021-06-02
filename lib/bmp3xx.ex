@@ -45,8 +45,7 @@ defmodule BMP3XX do
   """
   @spec start_link(options()) :: GenServer.on_start()
   def start_link(init_arg) do
-    name = Keyword.get(init_arg, :name, __MODULE__)
-    GenServer.start_link(__MODULE__, init_arg, name: name)
+    GenServer.start_link(__MODULE__, init_arg, name: init_arg[:name])
   end
 
   @doc """
