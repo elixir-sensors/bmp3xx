@@ -120,6 +120,10 @@ defmodule BMP3XX do
     bus_name = Keyword.get(args, :bus_name, "i2c-1")
     bus_address = Keyword.get(args, :bus_address, @default_bus_address)
 
+    Logger.info(
+      "[BMP3XX] Starting on bus #{bus_name} at address #{inspect(bus_address, base: :hex)}"
+    )
+
     with {:ok, transport} <-
            Transport.I2C.start_link(bus_name: bus_name, bus_address: bus_address),
          {:ok, sensor_type} <- Comm.sensor_type(transport) do
@@ -139,6 +143,7 @@ defmodule BMP3XX do
 
   @impl GenServer
   def handle_continue(:start_measuring, state) do
+    Logger.info("[BMP3XX] Initializing sensor type #{state.sensor_type}")
     new_state = state |> init_sensor() |> read_and_put_new_measurement()
     Process.send_after(self(), :schedule_measurement, @polling_interval_ms)
     {:noreply, new_state}
@@ -190,7 +195,7 @@ defmodule BMP3XX do
         %{state | last_measurement: measurement}
 
       {:error, reason} ->
-        Logger.error("Error reading measurement: #{inspect(reason)}")
+        Logger.error("[BMP3XX] Error reading measurement: #{inspect(reason)}")
         state
     end
   end
