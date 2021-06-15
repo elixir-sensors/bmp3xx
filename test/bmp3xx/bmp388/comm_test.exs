@@ -9,7 +9,7 @@ defmodule BMP3XX.BMP388.CommTest do
   setup :verify_on_exit!
 
   test "read_calibration" do
-    BMP3XX.MockI2C
+    BMP3XX.MockTransport
     |> Mox.expect(:write_read, 1, fn _, 0x31, 21 ->
       {:ok, <<0x236B5849F65CFFCEF42300EA636E79F3F6AA4312C4::168>>}
     end)
@@ -18,7 +18,7 @@ defmodule BMP3XX.BMP388.CommTest do
   end
 
   test "read_raw_samples" do
-    BMP3XX.MockI2C
+    BMP3XX.MockTransport
     |> Mox.expect(:write_read, 1, fn _, 0x04, 6 ->
       {:ok, <<0x979F6D73D885::48>>}
     end)
