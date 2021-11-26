@@ -64,7 +64,7 @@ defmodule BMP3XX.BMP388.Comm do
 
   @spec reset(Transport.t()) :: :ok | {:error, any}
   def reset(transport) do
-    with :ok <- Transport.I2C.write(transport, @reg_cmd, <<0xB6>>),
+    with :ok <- transport_mod().write(transport, [@reg_cmd, <<0xB6>>]),
          :ok <- Process.sleep(10),
          do: :ok
   end
@@ -78,11 +78,10 @@ defmodule BMP3XX.BMP388.Comm do
     temp_en = 1
     press_en = 1
 
-    Transport.I2C.write(
-      transport,
+    transport_mod().write(transport, [
       @reg_pwr_ctrl,
       <<0::2, mode::2, 0::2, temp_en::1, press_en::1>>
-    )
+    ])
   end
 
   @doc """
@@ -95,10 +94,10 @@ defmodule BMP3XX.BMP388.Comm do
     odr_sel = @odr_25_hz
     iir_filter = @iir_filter_coeff_3
 
-    with :ok <- Transport.I2C.write(transport, @reg_osr, <<0::2, osr_t::3, osr_p::3>>),
-         :ok <- Transport.I2C.write(transport, @reg_odr, <<0::3, odr_sel::5>>),
-         :ok <- Transport.I2C.write(transport, @reg_config, <<0::4, iir_filter::3, 0::1>>),
-         do: :ok
+    with :ok <- transport_mod().write(transport, [@reg_osr, <<0::2, osr_t::3, osr_p::3>>]),
+         :ok <- transport_mod().write(transport, [@reg_odr, <<0::3, odr_sel::5>>]) do
+      transport_mod().write(transport, [@reg_config, <<0::4, iir_filter::3, 0::1>>])
+    end
   end
 
   @doc """
@@ -114,11 +113,10 @@ defmodule BMP3XX.BMP388.Comm do
     int_level = @int_level_active_high
     int_od = 0
 
-    Transport.I2C.write(
-      transport,
+    transport_mod().write(transport, [
       @reg_int_ctrl,
       <<0::1, drdy_en::1, 0::1, ffull_en::1, fwtm_en::1, int_latch::1, int_level::1, int_od::1>>
-    )
+    ])
   end
 
   @doc """
@@ -130,16 +128,23 @@ defmodule BMP3XX.BMP388.Comm do
     i2c_wdt_en = 1
     spi3 = 0
 
-    Transport.I2C.write(transport, @reg_if_conf, <<0::5, i2c_wdt_sel::1, i2c_wdt_en::1, spi3::1>>)
+    transport_mod().write(transport, [
+      @reg_if_conf,
+      <<0::5, i2c_wdt_sel::1, i2c_wdt_en::1, spi3::1>>
+    ])
   end
 
   @spec read_calibration(Transport.t()) :: {:ok, <<_::168>>} | {:error, any}
   def read_calibration(transport) do
-    Transport.I2C.write_read(transport, @reg_calib_data, 21)
+    transport_mod().write_read(transport, [@reg_calib_data], 21)
   end
 
   @spec read_raw_samples(Transport.t()) :: {:error, any} | {:ok, <<_::48>>}
   def read_raw_samples(transport) do
-    Transport.I2C.write_read(transport, @reg_data, 6)
+    transport_mod().write_read(transport, [@reg_data], 6)
+  end
+
+  defp transport_mod() do
+    Application.get_env(:bmp3xx, :transport_mod, BMP3XX.Transport.I2C)
   end
 end

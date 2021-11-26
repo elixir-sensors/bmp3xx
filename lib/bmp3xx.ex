@@ -3,8 +3,6 @@ defmodule BMP3XX do
   Read pressure and temperature from a Bosch BMP388 or BMP390 sensor
   """
 
-  alias BMP3XX.{Comm, Transport}
-
   use GenServer
 
   require Logger
@@ -108,28 +106,29 @@ defmodule BMP3XX do
   """
   @spec detect(binary, bus_address) :: {:ok, sensor_type} | {:error, any}
   def detect(bus_name, bus_address \\ @default_bus_address) do
-    case Transport.I2C.start_link(bus_name: bus_name, bus_address: bus_address) do
-      {:ok, transport} -> Comm.sensor_type(transport)
+    case transport_mod().open(bus_name: bus_name, bus_address: bus_address) do
+      {:ok, transport} -> BMP3XX.Comm.sensor_type(transport)
       _error -> {:error, :device_not_found}
     end
   end
 
   @impl GenServer
   def init(args) do
-    bus_name = Keyword.get(args, :bus_name, "i2c-1")
-    bus_address = Keyword.get(args, :bus_address, @default_bus_address)
+    bus_name = Access.get(args, :bus_name, "i2c-1")
+    bus_address = Access.get(args, :bus_address, @default_bus_address)
+    sea_level_pa = Access.get(args, :sea_level_pa, @sea_level_pa)
 
     Logger.info(
       "[BMP3XX] Starting on bus #{bus_name} at address #{inspect(bus_address, base: :hex)}"
     )
 
     with {:ok, transport} <-
-           Transport.I2C.start_link(bus_name: bus_name, bus_address: bus_address),
-         {:ok, sensor_type} <- Comm.sensor_type(transport) do
+           transport_mod().open(bus_name: bus_name, bus_address: bus_address),
+         {:ok, sensor_type} <- BMP3XX.Comm.sensor_type(transport) do
       state = %State{
         calibration: nil,
         last_measurement: nil,
-        sea_level_pa: Keyword.get(args, :sea_level_pa, @sea_level_pa),
+        sea_level_pa: sea_level_pa,
         sensor_type: sensor_type,
         transport: transport
       }
@@ -181,11 +180,11 @@ defmodule BMP3XX do
   end
 
   defp init_sensor(state) do
-    state.sensor_type |> sensor_module() |> apply(:init, [state])
+    state.sensor_type |> sensor_mod() |> apply(:init, [state])
   end
 
   defp read_sensor(state) do
-    state.sensor_type |> sensor_module() |> apply(:read, [state])
+    state.sensor_type |> sensor_mod() |> apply(:read, [state])
   end
 
   defp read_and_put_new_measurement(state) do
@@ -199,7 +198,11 @@ defmodule BMP3XX do
     end
   end
 
-  defp sensor_module(:bmp388), do: BMP3XX.BMP388
-  defp sensor_module(:bmp390), do: BMP3XX.BMP388
-  defp sensor_module(other), do: raise("Unknown sensor type '#{inspect(other)}'")
+  defp sensor_mod(:bmp388), do: BMP3XX.BMP388
+  defp sensor_mod(:bmp390), do: BMP3XX.BMP388
+  defp sensor_mod(other), do: raise("Unknown sensor type '#{inspect(other)}'")
+
+  defp transport_mod() do
+    Application.get_env(:bmp3xx, :transport_mod, BMP3XX.Transport.I2C)
+  end
 end

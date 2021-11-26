@@ -6,7 +6,4 @@ end
 # Define dynamic mocks
 Mox.defmock(BMP3XX.MockTransport, for: BMP3XX.Transport)
 
-# Override the config settings
-Application.put_env(:bmp3xx, :transport_module, BMP3XX.MockTransport)
-
 ExUnit.start()

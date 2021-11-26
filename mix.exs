@@ -9,7 +9,6 @@ defmodule BMP3XX.MixProject do
       app: :bmp3xx,
       version: @version,
       elixir: "~> 1.11",
-      elixirc_paths: code(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       dialyzer: dialyzer(),
@@ -29,9 +28,6 @@ defmodule BMP3XX.MixProject do
       extra_applications: [:logger]
     ]
   end
-
-  defp code(:test), do: ["lib", "test/support"]
-  defp code(_), do: ["lib"]
 
   defp description do
     "Use Bosch BMP388 and BMP390 sensors in Elixir"
@@ -57,12 +53,12 @@ defmodule BMP3XX.MixProject do
 
   defp deps do
     [
-      {:i2c_server, "~> 0.2"},
+      {:circuits_i2c, "~> 1.0"},
       {:mox, "~> 1.0", only: :test},
-      {:ex_doc, "~> 0.22", only: :docs, runtime: false},
-      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.26", only: :docs, runtime: false},
+      {:mix_test_watch, "~> 1.1", only: :dev, runtime: false},
       {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
-      {:credo, "~> 1.5", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]
   end
 
