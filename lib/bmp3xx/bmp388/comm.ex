@@ -62,9 +62,9 @@ defmodule BMP3XX.BMP388.Comm do
 
   @spec reset(BMP3XX.Transport.t()) :: :ok | {:error, any()}
   def reset(transport) do
-    with :ok <- transport_mod().write(transport, [@reg_cmd, <<0xB6>>]),
-         :ok <- Process.sleep(10),
-         do: :ok
+    with :ok <- transport_mod().write(transport, [@reg_cmd, <<0xB6>>]) do
+      Process.sleep(10)
+    end
   end
 
   @doc """
