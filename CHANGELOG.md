@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.3
+
+* Improvements
+  * Simplify I2C-related code
+  * Improve type spec and refactor
+
 ## v0.1.2
 
 * Fixes
