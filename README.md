@@ -6,7 +6,7 @@
 Read temperature and pressure from Bosch
 [BMP388](https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp388/),
 and
-[BMP390](https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp390/),
+[BMP390](https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp390/)
 sensors in Elixir.
 
 ## Usage
