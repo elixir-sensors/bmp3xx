@@ -7,7 +7,7 @@ defmodule BMP3XX do
 
   require Logger
 
-  @type sensor_type :: :bmp388 | :bmp390
+  @type sensor_mod :: BMP3XX.BMP388 | BMP3XX.BMP390
 
   @type bus_address :: 0x76 | 0x77
 
@@ -30,11 +30,6 @@ defmodule BMP3XX do
   @default_bus_address 0x77
   @polling_interval_ms 1000
 
-  defmodule State do
-    @moduledoc false
-    defstruct [:calibration, :last_measurement, :sea_level_pa, :sensor_type, :transport]
-  end
-
   @doc """
   Start a new GenServer for interacting with a BMP3XX
 
@@ -52,9 +47,9 @@ defmodule BMP3XX do
   This function returns the cached result of reading the ID register.
   if the part is recognized. If not, it returns the integer read.
   """
-  @spec sensor_type(GenServer.server()) :: sensor_type
-  def sensor_type(server \\ __MODULE__) do
-    GenServer.call(server, :sensor_type)
+  @spec sensor_mod(GenServer.server()) :: sensor_mod()
+  def sensor_mod(server \\ __MODULE__) do
+    GenServer.call(server, :sensor_mod)
   end
 
   @doc """
@@ -104,7 +99,7 @@ defmodule BMP3XX do
 
   The bus address is likely going to be 0x77 (the default) or 0x76.
   """
-  @spec detect(binary, bus_address) :: {:ok, sensor_type} | {:error, any}
+  @spec detect(binary, bus_address) :: {:ok, sensor_mod()} | {:error, any()}
   def detect(bus_name, bus_address \\ @default_bus_address) do
     case transport_mod().open(bus_name: bus_name, bus_address: bus_address) do
       {:ok, transport} -> BMP3XX.Comm.sensor_type(transport)
@@ -124,12 +119,12 @@ defmodule BMP3XX do
 
     with {:ok, transport} <-
            transport_mod().open(bus_name: bus_name, bus_address: bus_address),
-         {:ok, sensor_type} <- BMP3XX.Comm.sensor_type(transport) do
-      state = %State{
+         {:ok, sensor_mod} <- BMP3XX.Comm.sensor_type(transport) do
+      state = %BMP3XX.Sensor{
         calibration: nil,
         last_measurement: nil,
         sea_level_pa: sea_level_pa,
-        sensor_type: sensor_type,
+        sensor_mod: sensor_mod,
         transport: transport
       }
 
@@ -141,7 +136,7 @@ defmodule BMP3XX do
 
   @impl GenServer
   def handle_continue(:start_measuring, state) do
-    Logger.info("[BMP3XX] Initializing sensor type #{state.sensor_type}")
+    Logger.info("[BMP3XX] Initializing sensor type #{state.sensor_mod}")
     new_state = state |> init_sensor() |> read_and_put_new_measurement()
     Process.send_after(self(), :schedule_measurement, @polling_interval_ms)
     {:noreply, new_state}
@@ -156,8 +151,8 @@ defmodule BMP3XX do
     end
   end
 
-  def handle_call(:sensor_type, _from, state) do
-    {:reply, state.sensor_type, state}
+  def handle_call(:sensor_mod, _from, state) do
+    {:reply, state.sensor_mod, state}
   end
 
   def handle_call({:update_sea_level, new_estimate}, _from, state) do
@@ -180,11 +175,14 @@ defmodule BMP3XX do
   end
 
   defp init_sensor(state) do
-    state.sensor_type |> sensor_mod() |> apply(:init, [state])
+    case state.sensor_mod.init(state) do
+      {:ok, state} -> state
+      _error -> raise("Error initializing sensor")
+    end
   end
 
   defp read_sensor(state) do
-    state.sensor_type |> sensor_mod() |> apply(:read, [state])
+    state.sensor_mod.read(state)
   end
 
   defp read_and_put_new_measurement(state) do
@@ -197,10 +195,6 @@ defmodule BMP3XX do
         state
     end
   end
-
-  defp sensor_mod(:bmp388), do: BMP3XX.BMP388
-  defp sensor_mod(:bmp390), do: BMP3XX.BMP388
-  defp sensor_mod(other), do: raise("Unknown sensor type '#{inspect(other)}'")
 
   defp transport_mod() do
     Application.get_env(:bmp3xx, :transport_mod, BMP3XX.Transport.I2C)

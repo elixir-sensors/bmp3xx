@@ -40,7 +40,7 @@ defmodule BMP3XX.BMP388.Calibration do
   * https://github.com/BoschSensortec/BMP3-Sensor-API/blob/5c13e49e7649099696ff6ca5f5fe3ad4ab3f5d96/bmp3_defs.h#L545
   * https://github.com/BoschSensortec/BMP3-Sensor-API/blob/5c13e49e7649099696ff6ca5f5fe3ad4ab3f5d96/bmp3.c#L2416
   """
-  @spec from_binary(<<_::168>>) :: t
+  @spec from_binary(<<_::168>>) :: t()
   def from_binary(<<
         par_t1::little-unsigned-16,
         par_t2::little-unsigned-16,
@@ -79,7 +79,7 @@ defmodule BMP3XX.BMP388.Calibration do
   Calculate the temperature in Celsius. See docs:
   * https://github.com/BoschSensortec/BMP3-Sensor-API/blob/5c13e49e7649099696ff6ca5f5fe3ad4ab3f5d96/bmp3.c#L2442
   """
-  @spec raw_to_pressure_pa_and_temperature_c(t, <<_::48>>) :: {float, float}
+  @spec raw_to_pressure_pa_and_temperature_c(t, <<_::48>>) :: {float(), float()}
   def raw_to_pressure_pa_and_temperature_c(calibration, raw_samples) do
     <<raw_pressure::little-unsigned-24, raw_temperature::little-unsigned-24>> = raw_samples
 
@@ -104,7 +104,7 @@ defmodule BMP3XX.BMP388.Calibration do
   Calculate the pressure in Pascal. See docs:
   * https://github.com/BoschSensortec/BMP3-Sensor-API/blob/5c13e49e7649099696ff6ca5f5fe3ad4ab3f5d96/bmp3.c#L2471
   """
-  @spec raw_to_pressure_pa(t, number, number) :: float
+  @spec raw_to_pressure_pa(t(), number(), number()) :: float()
   def raw_to_pressure_pa(cal, raw_pressure, t_lin) do
     var1 = t_lin * t_lin
     var2 = var1 / 64

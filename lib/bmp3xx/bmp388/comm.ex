@@ -1,8 +1,6 @@
 defmodule BMP3XX.BMP388.Comm do
   @moduledoc false
 
-  alias BMP3XX.Transport
-
   # https://github.com/BoschSensortec/BMP3-Sensor-API/blob/5c13e49e7649099696ff6ca5f5fe3ad4ab3f5d96/bmp3_defs.h#L142
   @reg_data 0x04
   @reg_int_ctrl 0x19
@@ -62,7 +60,7 @@ defmodule BMP3XX.BMP388.Comm do
   # @i2c_wdt_short_1_25_ms 0x00
   @i2c_wdt_long_40_ms 0x01
 
-  @spec reset(Transport.t()) :: :ok | {:error, any}
+  @spec reset(BMP3XX.Transport.t()) :: :ok | {:error, any()}
   def reset(transport) do
     with :ok <- transport_mod().write(transport, [@reg_cmd, <<0xB6>>]),
          :ok <- Process.sleep(10),
@@ -72,7 +70,7 @@ defmodule BMP3XX.BMP388.Comm do
   @doc """
   Set the power control(pressure enable and temperature enable).
   """
-  @spec set_power_control_settings(Transport.t()) :: :ok | {:error, any}
+  @spec set_power_control_settings(BMP3XX.Transport.t()) :: :ok | {:error, any()}
   def set_power_control_settings(transport) do
     mode = @mode_normal
     temp_en = 1
@@ -87,7 +85,7 @@ defmodule BMP3XX.BMP388.Comm do
   @doc """
   Set the over sampling, ODR (output data rate or sampling rate) and filter settings.
   """
-  @spec set_odr_and_filter_settings(Transport.t()) :: :ok | {:error, any}
+  @spec set_odr_and_filter_settings(BMP3XX.Transport.t()) :: :ok | {:error, any()}
   def set_odr_and_filter_settings(transport) do
     osr_t = @oversampling_2x
     osr_p = @oversampling_16x
@@ -104,7 +102,7 @@ defmodule BMP3XX.BMP388.Comm do
   Set the interrupt control (output mode, level, latch and data ready) settings of the sensor
   based on the settings selected by the user.
   """
-  @spec set_interrupt_control_settings(Transport.t()) :: :ok | {:error, any}
+  @spec set_interrupt_control_settings(BMP3XX.Transport.t()) :: :ok | {:error, any()}
   def set_interrupt_control_settings(transport) do
     drdy_en = 0
     ffull_en = 0
@@ -122,7 +120,7 @@ defmodule BMP3XX.BMP388.Comm do
   @doc """
   Set the serial interface settings.
   """
-  @spec set_serial_interface_settings(Transport.t()) :: :ok | {:error, any}
+  @spec set_serial_interface_settings(BMP3XX.Transport.t()) :: :ok | {:error, any()}
   def set_serial_interface_settings(transport) do
     i2c_wdt_sel = @i2c_wdt_long_40_ms
     i2c_wdt_en = 1
@@ -134,12 +132,12 @@ defmodule BMP3XX.BMP388.Comm do
     ])
   end
 
-  @spec read_calibration(Transport.t()) :: {:ok, <<_::168>>} | {:error, any}
+  @spec read_calibration(BMP3XX.Transport.t()) :: {:ok, <<_::168>>} | {:error, any()}
   def read_calibration(transport) do
     transport_mod().write_read(transport, [@reg_calib_data], 21)
   end
 
-  @spec read_raw_samples(Transport.t()) :: {:error, any} | {:ok, <<_::48>>}
+  @spec read_raw_samples(BMP3XX.Transport.t()) :: {:error, any()} | {:ok, <<_::48>>}
   def read_raw_samples(transport) do
     transport_mod().write_read(transport, [@reg_data], 6)
   end

@@ -19,11 +19,12 @@ defmodule BMP3XX.BMP388.MeasurementTest do
     par_p11: -60
   }
 
+  @sea_level_pa 101_913.14
+
   test "from_raw_samples" do
     result =
       <<151, 159, 109, 115, 216, 133>>
-      |> Measurement.from_raw_samples(@calibration)
-      |> Measurement.put_altitude_m(101_913.14)
+      |> Measurement.from_raw_samples(@calibration, @sea_level_pa)
 
     assert %BMP3XX.Measurement{
              altitude_m: 86.2037596584836,

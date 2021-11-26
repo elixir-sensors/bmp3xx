@@ -11,9 +11,9 @@ defmodule BMP3XX.Measurement do
   ]
 
   @type t :: %__MODULE__{
-          altitude_m: number,
-          pressure_pa: number,
-          temperature_c: number,
-          timestamp_ms: number
+          altitude_m: number(),
+          pressure_pa: number(),
+          temperature_c: number(),
+          timestamp_ms: integer()
         }
 end
