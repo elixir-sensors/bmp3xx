@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.4
+
+* Improvements
+  * Support both v0 and v1 of `circuits_i2c`
+
 ## v0.1.3
 
 * Improvements
