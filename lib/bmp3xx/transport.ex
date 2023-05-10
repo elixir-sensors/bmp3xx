@@ -1,69 +1,44 @@
 defmodule BMP3XX.Transport do
   @moduledoc false
+  # Just a thin wrapper around the Circuits.I2C module for our convenience
 
-  defstruct [:ref, :bus_address]
+  defstruct [:bus, :address, :options]
 
-  @type t :: %__MODULE__{ref: reference(), bus_address: 0..127}
-  @type option :: {:bus_name, String.t()} | {:bus_address, 0..127}
+  @type address :: 0x76 | 0x77
+  @type t :: %__MODULE__{bus: any, address: address, options: keyword}
+  @type i2c_options :: [Circuits.I2C.opt()]
 
-  @callback open([option()]) :: {:ok, t()} | {:error, any()}
-
-  @callback read(t(), pos_integer()) :: {:ok, binary()} | {:error, any()}
-
-  @callback write(t(), iodata()) :: :ok | {:error, any()}
-
-  @callback write_read(t(), iodata(), pos_integer()) :: {:ok, binary()} | {:error, any()}
-end
-
-defmodule BMP3XX.Transport.I2C do
-  @moduledoc false
-
-  @behaviour BMP3XX.Transport
-
-  @impl BMP3XX.Transport
-  def open(opts) do
-    bus_name = Access.fetch!(opts, :bus_name)
-    bus_address = Access.fetch!(opts, :bus_address)
-
+  @spec open(binary, address, i2c_options) :: {:error, any} | {:ok, t}
+  def open(bus_name, address, options \\ []) do
     case Circuits.I2C.open(bus_name) do
-      {:ok, ref} ->
-        {:ok, %BMP3XX.Transport{ref: ref, bus_address: bus_address}}
+      {:ok, bus} ->
+        {:ok, __struct__(bus: bus, address: address, options: options)}
 
-      _ ->
-        :error
+      {:error, error} ->
+        {:error, error}
     end
   end
 
-  @impl BMP3XX.Transport
-  def read(transport, bytes_to_read) do
-    Circuits.I2C.read(transport.ref, transport.bus_address, bytes_to_read)
+  @spec read(t, pos_integer, i2c_options) :: {:error, any} | {:ok, binary}
+  def read(%__MODULE__{} = t, count, options \\ []) do
+    options = Enum.into(options, t.options)
+    Circuits.I2C.read(t.bus, t.address, count, options)
   end
 
-  @impl BMP3XX.Transport
-  def write(transport, register_and_data) do
-    Circuits.I2C.write(transport.ref, transport.bus_address, register_and_data)
+  @spec write(t, iodata, i2c_options) :: :ok | {:error, any}
+  def write(%__MODULE__{} = t, data, options \\ []) do
+    options = Enum.into(options, t.options)
+    Circuits.I2C.write(t.bus, t.address, data, options)
   end
 
-  @impl BMP3XX.Transport
-  def write_read(transport, register, bytes_to_read) do
-    Circuits.I2C.write_read(transport.ref, transport.bus_address, register, bytes_to_read)
+  @spec write_read(t, iodata, pos_integer, i2c_options) :: {:error, any} | {:ok, binary}
+  def write_read(%__MODULE__{} = t, write_data, read_count, options \\ []) do
+    options = Enum.into(options, t.options)
+    Circuits.I2C.write_read(t.bus, t.address, write_data, read_count, options)
   end
-end
 
-defmodule BMP3XX.Transport.Stub do
-  @moduledoc false
-
-  @behaviour BMP3XX.Transport
-
-  @impl BMP3XX.Transport
-  def open(_opts), do: {:ok, %BMP3XX.Transport{ref: make_ref(), bus_address: 0x00}}
-
-  @impl BMP3XX.Transport
-  def read(_transport, _bytes_to_read), do: {:ok, "stub"}
-
-  @impl BMP3XX.Transport
-  def write(_transport, _data), do: :ok
-
-  @impl BMP3XX.Transport
-  def write_read(_transport, _data, _bytes_to_read), do: {:ok, "stub"}
+  @spec close(t) :: :ok
+  def close(%__MODULE__{} = t) do
+    Circuits.I2C.close(t.bus)
+  end
 end

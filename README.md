@@ -3,11 +3,11 @@
 [![Hex version](https://img.shields.io/hexpm/v/bmp3xx.svg "Hex version")](https://hex.pm/packages/bmp3xx)
 [![CI](https://github.com/mnishiguchi/bmp3xx/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mnishiguchi/bmp3xx/actions/workflows/ci.yml)
 
-Read temperature and pressure from Bosch
-[BMP388](https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp388/),
-and
-[BMP390](https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp390/)
-sensors in Elixir.
+<!-- MODULEDOC -->
+Read temperature and pressure in Elixir from [Bosch environmental
+sensors](https://www.bosch-sensortec.com/products/environmental-sensors/) such
+as BMP180, BMP280, BME280, BME680, BMP388, and BMP390.
+<!-- MODULEDOC -->
 
 ## Usage
 
