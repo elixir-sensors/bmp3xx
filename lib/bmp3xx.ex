@@ -79,7 +79,7 @@ defmodule BMP3XX do
   This function returns an error if the attempt to sample the current barometric
   pressure fails.
   """
-  @spec force_altitude(GenServer.server(), number) :: {:ok, number} | {:error, any}
+  @spec force_altitude(GenServer.server(), number) :: :ok | {:error, any}
   def force_altitude(server \\ __MODULE__, altitude_m) do
     GenServer.call(server, {:force_altitude, altitude_m})
   end
@@ -172,7 +172,7 @@ defmodule BMP3XX do
     sea_level_pa = BMP3XX.Calc.sea_level_pressure(state.last_measurement.pressure_pa, altitude_m)
     new_state = State.put_in_sensor(state, :sea_level_pa, sea_level_pa)
 
-    {:reply, {:ok, sea_level_pa}, new_state}
+    {:reply, :ok, new_state}
   end
 
   @impl GenServer
