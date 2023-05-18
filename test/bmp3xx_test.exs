@@ -23,7 +23,7 @@ defmodule BMP3XXTest do
 
   @tag sensor_type: :bmp380
   test "supports bmp380", %{bmp_name: bmp_name} do
-    {:ok, _} = BMP3XX.force_altitude(bmp_name, 100)
+    :ok = BMP3XX.force_altitude(bmp_name, 100)
     {:ok, measurement} = BMP3XX.measure(bmp_name)
     assert_in_delta measurement.temperature_c, 30.49, 0.1
     assert_in_delta measurement.pressure_pa, 100_876, 1
@@ -34,7 +34,7 @@ defmodule BMP3XXTest do
 
   @tag sensor_type: :bmp390
   test "supports bmp390", %{bmp_name: bmp_name} do
-    {:ok, _} = BMP3XX.force_altitude(bmp_name, 100)
+    :ok = BMP3XX.force_altitude(bmp_name, 100)
     {:ok, measurement} = BMP3XX.measure(bmp_name)
     assert_in_delta measurement.temperature_c, 30.49, 0.1
     assert_in_delta measurement.pressure_pa, 100_876, 1
@@ -45,7 +45,7 @@ defmodule BMP3XXTest do
 
   @tag sensor_type: :bmp180
   test "supports bmp180", %{bmp_name: bmp_name} do
-    {:ok, _} = BMP3XX.force_altitude(bmp_name, 100)
+    :ok = BMP3XX.force_altitude(bmp_name, 100)
     {:ok, measurement} = BMP3XX.measure(bmp_name)
     assert_in_delta measurement.temperature_c, 22.3, 0.1
     assert_in_delta measurement.pressure_pa, 101_132, 1
@@ -56,7 +56,7 @@ defmodule BMP3XXTest do
 
   @tag sensor_type: :bmp280
   test "supports bmp280", %{bmp_name: bmp_name} do
-    {:ok, _} = BMP3XX.force_altitude(bmp_name, 100)
+    :ok = BMP3XX.force_altitude(bmp_name, 100)
     {:ok, measurement} = BMP3XX.measure(bmp_name)
     assert_in_delta measurement.temperature_c, 26.7, 0.1
     assert_in_delta measurement.pressure_pa, 100_391, 1
@@ -67,7 +67,7 @@ defmodule BMP3XXTest do
 
   @tag sensor_type: :bme280
   test "supports bme280", %{bmp_name: bmp_name} do
-    {:ok, _} = BMP3XX.force_altitude(bmp_name, 100)
+    :ok = BMP3XX.force_altitude(bmp_name, 100)
     {:ok, measurement} = BMP3XX.measure(bmp_name)
     assert_in_delta measurement.temperature_c, 26.7, 0.1
     assert_in_delta measurement.pressure_pa, 100_391, 1
@@ -78,7 +78,7 @@ defmodule BMP3XXTest do
 
   @tag sensor_type: :bme680
   test "supports bme680", %{bmp_name: bmp_name} do
-    {:ok, _} = BMP3XX.force_altitude(bmp_name, 100)
+    :ok = BMP3XX.force_altitude(bmp_name, 100)
     {:ok, measurement} = BMP3XX.measure(bmp_name)
     assert_in_delta measurement.temperature_c, 19.3, 0.1
     assert_in_delta measurement.pressure_pa, 100_977, 1
