@@ -1,7 +1,7 @@
 defmodule BMP3XX.MixProject do
   use Mix.Project
 
-  @version "0.1.4"
+  @version "0.1.5"
   @description "Use Bosch environment sensors in Elixir"
   @source_url "https://github.com/mnishiguchi/bmp3xx"
 
