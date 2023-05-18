@@ -67,7 +67,14 @@ defmodule BMP3XX.MixProject do
       ],
       licenses: ["Apache-2.0"],
       links: %{
-        "GitHub" => @source_url
+        "GitHub" => @source_url,
+        "BMP180 data sheet" => "https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf",
+        "BMP280 data_sheet" => "https://cdn-shop.adafruit.com/datasheets/BST-BMP280-DS001-11.pdf",
+        "BMP388 data_sheet" =>
+          "https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp388-ds001.pdf",
+        "BME280 data_sheet" =>
+          "https://cdn-learn.adafruit.com/assets/assets/000/115/588/original/bst-bme280-ds002.pdf",
+        "BME680 data_sheet" => "https://cdn-shop.adafruit.com/product-files/3660/BME680.pdf"
       }
     }
   end
