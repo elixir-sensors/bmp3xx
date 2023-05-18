@@ -6,14 +6,20 @@ defmodule BMP3XX.Measurement do
   defstruct [
     :altitude_m,
     :pressure_pa,
-    :temperature_c,
-    :timestamp_ms
+    :timestamp_ms,
+    dew_point_c: :unknown,
+    gas_resistance_ohms: :unknown,
+    humidity_rh: :unknown,
+    temperature_c: :unknown
   ]
 
   @type t :: %__MODULE__{
-          altitude_m: number(),
-          pressure_pa: number(),
-          temperature_c: number(),
-          timestamp_ms: integer()
+          altitude_m: number,
+          pressure_pa: number,
+          timestamp_ms: integer,
+          dew_point_c: number | :unknown,
+          gas_resistance_ohms: number | :unknown,
+          humidity_rh: number | :unknown,
+          temperature_c: number | :unknown
         }
 end

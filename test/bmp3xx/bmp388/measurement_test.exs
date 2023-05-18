@@ -1,6 +1,6 @@
-defmodule BMP3XX.BMP388.MeasurementTest do
+defmodule BMP3XX.BMP380.MeasurementTest do
   use ExUnit.Case, async: true
-  alias BMP3XX.BMP388.Measurement
+  alias BMP3XX.BMP380.Measurement
 
   @calibration %{
     par_t1: 27_427,
@@ -21,10 +21,10 @@ defmodule BMP3XX.BMP388.MeasurementTest do
 
   @sea_level_pa 101_913.14
 
-  test "from_raw_samples" do
+  test "from_raw" do
     result =
       <<151, 159, 109, 115, 216, 133>>
-      |> Measurement.from_raw_samples(@calibration, @sea_level_pa)
+      |> Measurement.from_raw(@calibration, @sea_level_pa)
 
     assert %BMP3XX.Measurement{
              altitude_m: 86.2037596584836,

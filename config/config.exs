@@ -1,3 +1,9 @@
 import Config
 
-config :bmp3xx, transport_mod: BMP3XX.MockTransport
+# https://github.com/elixir-circuits/circuits_sim
+config :circuits_sim,
+  config: [
+    {CircuitsSim.Device.BMP3XX, bus_name: "i2c-1", address: 0x77}
+  ]
+
+config :circuits_i2c, default_backend: CircuitsSim.I2C.Backend

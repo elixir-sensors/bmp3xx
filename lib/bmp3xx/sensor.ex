@@ -1,17 +1,16 @@
-defmodule BMP3XX.Sensor do
+defprotocol BMP3XX.Sensor do
   @moduledoc false
+  # A protocol for BMP3XX sensors.
 
-  defstruct [:calibration, :last_measurement, :sea_level_pa, :sensor_mod, :transport]
+  @doc """
+  Initialize a sensor.
+  """
+  @spec init(t(), options :: keyword) :: {:ok, t()} | {:error, any}
+  def init(dev, options \\ [])
 
-  @type t :: %{
-          calibration: map(),
-          last_measurement: map(),
-          sea_level_pa: number(),
-          sensor_mod: atom(),
-          transport: BMP3XX.Transport.t()
-        }
-
-  @callback init(BMP3XX.Sensor.t()) :: {:ok, BMP3XX.Sensor.t()} | {:error, any()}
-
-  @callback read(BMP3XX.Sensor.t()) :: {:ok, BMP3XX.Measurement.t()} | {:error, any()}
+  @doc """
+  Read output data from a sensor.
+  """
+  @spec measure(t(), options :: keyword) :: {:ok, map} | {:error, any}
+  def measure(dev, options \\ [])
 end

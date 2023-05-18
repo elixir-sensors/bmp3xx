@@ -1,20 +1,58 @@
 defmodule BMP3XX.Comm do
   @moduledoc false
 
-  # https://github.com/BoschSensortec/BMP3-Sensor-API/blob/5c13e49e7649099696ff6ca5f5fe3ad4ab3f5d96/bmp3_defs.h#L142
+  alias BMP3XX.Transport
+
+  @bmp2_reg_chip_id 0xD0
   @bmp3_reg_chip_id 0x00
 
-  @spec sensor_type(BMP3XX.Transport.t()) :: {:ok, atom()} | {:error, any()}
-  def sensor_type(transport) do
-    case transport_mod().write_read(transport, [@bmp3_reg_chip_id], 1) do
-      {:ok, <<0x50>>} -> {:ok, BMP3XX.BMP388}
-      {:ok, <<0x60>>} -> {:ok, BMP3XX.BMP390}
-      {:ok, _} -> {:error, "Unsupported chip ID"}
-      error -> error
+  @spec get_sensor_type(Transport.t()) :: {:ok, BMP3XX.sensor_type()} | {:error, any}
+  def get_sensor_type(transport) do
+    case get_bmp3_sensor_type(transport) do
+      {:ok, bmp3_sensor_type} ->
+        {:ok, bmp3_sensor_type}
+
+      {:error, _error} ->
+        get_bmp2_sensor_type(transport)
     end
   end
 
-  defp transport_mod() do
-    Application.get_env(:bmp3xx, :transport_mod, BMP3XX.Transport.I2C)
+  defp get_bmp2_sensor_type(transport) do
+    case Transport.write_read(transport, [@bmp2_reg_chip_id], 1) do
+      {:ok, <<value>>} ->
+        if bmp2_sensor_type(value) do
+          {:ok, bmp2_sensor_type(value)}
+        else
+          {:error, "unsupported chip ID #{inspect(value, base: :hex)}"}
+        end
+
+      {:error, error} ->
+        {:error, error}
+    end
   end
+
+  defp get_bmp3_sensor_type(transport) do
+    case Transport.write_read(transport, [@bmp3_reg_chip_id], 1) do
+      {:ok, <<value>>} ->
+        if bmp3_sensor_type(value) do
+          {:ok, bmp3_sensor_type(value)}
+        else
+          {:error, "unsupported chip ID #{inspect(value, base: :hex)}"}
+        end
+
+      {:error, error} ->
+        {:error, error}
+    end
+  end
+
+  defp bmp2_sensor_type(0x55), do: :bmp180
+  defp bmp2_sensor_type(0x58), do: :bmp280
+  defp bmp2_sensor_type(0x60), do: :bme280
+  defp bmp2_sensor_type(0x61), do: :bme680
+  defp bmp2_sensor_type(_), do: nil
+
+  # https://github.com/boschsensortec/BMP3-Sensor-API/blob/5c13e49e7649099696ff6ca5f5fe3ad4ab3f5d96/bmp3_defs.h#LL130C3-L130C3
+  defp bmp3_sensor_type(0x50), do: :bmp380
+  defp bmp3_sensor_type(0x60), do: :bmp390
+  defp bmp3_sensor_type(_), do: nil
 end
