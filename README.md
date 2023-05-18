@@ -6,7 +6,7 @@
 <!-- MODULEDOC -->
 Read temperature and pressure in Elixir from [Bosch environmental
 sensors](https://www.bosch-sensortec.com/products/environmental-sensors/) such
-as BMP180, BMP280, BME280, BME680, BMP388, and BMP390.
+as BMP180, BMP280, BME280, BMP380, BMP390, BME680, etc.
 <!-- MODULEDOC -->
 
 ## Usage

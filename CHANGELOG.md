@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.6
+
+### Fixed
+- Standardize on the return value of `force_altitude` to be consistent with [bmp280](https://github.com/elixir-sensors/bmp280). (was: `{:ok, number}`, now: `:ok`)
+
 ## v0.1.5
 
 ### Breaking changes
