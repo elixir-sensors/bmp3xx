@@ -6,7 +6,7 @@
 <!-- MODULEDOC -->
 Read temperature and pressure in Elixir from [Bosch environmental
 sensors](https://www.bosch-sensortec.com/products/environmental-sensors/) such
-as BMP180, BMP280, BME280, BMP380, BMP390, BME680, etc.
+as BMP180, BMP280, BME280, BMP384, BMP388, BMP390, BME680, BME688, etc.
 <!-- MODULEDOC -->
 
 ## Usage
@@ -27,7 +27,8 @@ iex> BMP3XX.measure(bmp)
 ```
 
 Depending on your hardware configuration, you may need to modify the call to
-[`BMP3XX.start_link/1`](https://hexdocs.pm/bmp3xx/BMP3XX.html#start_link/1). See [`t:BMP3XX.options/0`](https://hexdocs.pm/bmp3xx/BMP3XX.html#t:options/0) for parameters.
+[`BMP3XX.start_link/1`](https://hexdocs.pm/bmp3xx/BMP3XX.html#start_link/1).
+See [`t:BMP3XX.options/0`](https://hexdocs.pm/bmp3xx/BMP3XX.html#t:options/0) for parameters.
 
 All measurements are reported in SI units.
 

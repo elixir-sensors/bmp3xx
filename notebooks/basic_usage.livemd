@@ -1,0 +1,177 @@
+# Hello BMP3XX
+
+```elixir
+bus_name = "i2c-1"
+bus_address = 0x77
+
+Mix.install(
+  [
+    {:circuits_i2c, github: "elixir-circuits/circuits_i2c", branch: "v2.0", override: true},
+    {:circuits_sim, github: "elixir-circuits/circuits_sim", branch: "main"},
+    {:kino, "~> 0.9.3"},
+    {:bmp3xx, "~> 0.1.5"}
+  ],
+  config: [
+    circuits_i2c: [default_backend: CircuitsSim.I2C.Backend],
+    circuits_sim: [
+      config: [
+        {CircuitsSim.Device.BMP3XX,
+         [bus_name: bus_name, address: bus_address, sensor_type: :bmp180]}
+      ]
+    ]
+  ]
+)
+```
+
+## Introduction
+
+This notebook demonstrates how to read temperature, humidity etc from [Bosch
+environment
+sensors](https://www.bosch-sensortec.com/products/environmental-sensors). Our
+[Nerves target device](https://hexdocs.pm/nerves/targets.html) will communicate
+with a sensor board using the [I2C](https://en.wikipedia.org/wiki/I%C2%B2C)
+protocol.
+
+[![](https://cdn.sparkfun.com//assets/parts/1/4/0/1/4/15440-SparkFun_Atmospheric_Sensor_Breakout_-_BME280__Qwiic_-04a.jpg)](https://www.sparkfun.com/products/15440)
+
+We need a few libraries for using a Bosch environment sensor in this notebook:
+
+* The [circuits_i2c](https://hexdocs.pm/circuits_i2c) package allows us to communicate with hardware devices using the I2C protocol
+* The experimental [circuits_sim](https://github.com/elixir-circuits/circuits_sim) package provides simulated I2C devices
+* The [bmp3xx](https://hexdocs.pm/bmp3xx) package abstract the logic to use Bosch environment sensor boards
+
+The bmp3xx package support various environment sensors including:
+
+* BMP180
+* BMP280
+* BMP384
+* BMP388
+* BMP390
+* BME280
+* BME680
+
+Running this notebook on the [Nerves Livebook
+firmware](https://github.com/livebook-dev/nerves_livebook/blob/main/README.md),
+you can access directly to the real sensor board.
+
+If you don't have a real sensor board, don't worry. It's possible to work with
+a simulated device that is configured in the setup section above.
+
+```elixir
+i2c_backend_select_form =
+  Kino.Control.form(
+    [
+      i2c_backend:
+        Kino.Input.select(
+          "I2C backend",
+          [
+            {CircuitsSim.I2C.Backend, "Simulated I2C"},
+            {Circuits.I2C.I2CDev, "Real I2C"}
+          ]
+        )
+    ],
+    submit: "Select I2C backend"
+  )
+
+Kino.render(i2c_backend_select_form)
+
+Kino.listen(i2c_backend_select_form, fn event ->
+  selected_backend = event.data.i2c_backend
+  Application.put_env(:circuits_i2c, :default_backend, selected_backend)
+  IO.puts("Selected I2C backend: #{selected_backend}")
+
+  case selected_backend do
+    CircuitsSim.I2C.Backend ->
+      sensor_type_select_form =
+        Kino.Control.form(
+          [
+            sensor_type:
+              Kino.Input.select("Sensor type", [
+                {:bmp180, "bmp180"},
+                {:bmp280, "bmp280"},
+                {:bmp380, "bmp380"},
+                {:bme280, "bme280"},
+                {:bme680, "bme680"}
+              ])
+          ],
+          submit: "Select sensor type"
+        )
+
+      Kino.render(sensor_type_select_form)
+
+      Kino.listen(sensor_type_select_form, fn event ->
+        selected_sensor_type = event.data.sensor_type
+        IO.puts("Selected sensor type: #{selected_sensor_type}")
+
+        [{_, i2c_server, _, [CircuitsSim.I2C.I2CServer]}] =
+          Supervisor.which_children(CircuitSim.DeviceSupervisor)
+
+        :sys.replace_state(
+          i2c_server,
+          &%{&1 | device: CircuitsSim.Device.BMP3XX.new(sensor_type: selected_sensor_type)}
+        )
+
+        Circuits.I2C.detect_devices()
+      end)
+
+    Circuits.I2C.I2CDev ->
+      Circuits.I2C.detect_devices()
+  end
+end)
+```
+
+## Basic usage
+
+The basic usage only takes two steps:
+
+* start a BMP3XX server
+* read output
+
+```elixir
+stop_bmp3xx = fn _event ->
+  if Process.whereis(BMP3XX) do
+    GenServer.stop(BMP3XX)
+    IO.puts("BMP3XX was stopped")
+  end
+end
+
+start_bmp3xx = fn _event ->
+  stop_bmp3xx.([])
+  BMP3XX.start_link(bus_name: bus_name, bus_address: bus_address, name: BMP3XX)
+end
+
+start_button = Kino.Control.button("Start BMP3XX")
+Kino.listen(start_button, start_bmp3xx)
+
+stop_button = Kino.Control.button("Stop BMP3XX")
+Kino.listen(stop_button, stop_bmp3xx)
+
+Kino.Layout.grid([start_button, stop_button], columns: 2)
+```
+
+```elixir
+BMP3XX.measure(BMP3XX)
+```
+
+Optionally, you can force the altitude to a known value.
+
+```elixir
+BMP3XX.force_altitude(BMP3XX, 100)
+```
+
+For details, refer to the [API reference](https://hexdocs.pm/bmp3xx/api-reference.html).
+
+## Hardware
+
+For the curious, here is some information about the [Bosch environment sensors](https://www.bosch-sensortec.com/products/environmental-sensors).
+
+* Sparkfun's [BME68x(Qwiic) Hookup Guide](https://learn.sparkfun.com/tutorials/sparkfun-environmental-sensor-breakout---bme68x-qwiic-hookup-guide/all)
+* [BMP180 data sheet](https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf)
+* [BMP280 data_sheet](https://cdn-shop.adafruit.com/datasheets/BST-BMP280-DS001-11.pdf)
+* [BMP388 data_sheet](https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp388-ds001.pdf)
+* [BME280 data_sheet](https://cdn-learn.adafruit.com/assets/assets/000/115/588/original/bst-bme280-ds002.pdf)
+* [BME680 data_sheet](https://cdn-shop.adafruit.com/product-files/3660/BME680.pdf)
+
+For a hands-on Nerves tutorial, checkout this book.
+
+[![](https://pragprog.com/titles/passweather/build-a-weather-station-with-elixir-and-nerves/passweather-250.jpg)](https://pragprog.com/titles/passweather/build-a-weather-station-with-elixir-and-nerves/)
