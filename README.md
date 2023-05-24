@@ -9,6 +9,8 @@ sensors](https://www.bosch-sensortec.com/products/environmental-sensors/) such
 as BMP180, BMP280, BME280, BMP384, BMP388, BMP390, BME680, BME688, etc.
 <!-- MODULEDOC -->
 
+[![Run in Livebook](https://livebook.dev/badge/v1/blue.svg)](https://livebook.dev/run?url=https%3A%2F%2Fgithub.com%2Felixir-sensors%2Fbmp3xx%2Fblob%2Fmain%2Fnotebooks%2Fbasic_usage.livemd)
+
 ## Usage
 
 Here's an example use (most sensors are at address 0x77, but some are at 0x76):
