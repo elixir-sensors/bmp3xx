@@ -12,18 +12,18 @@ permissions:
 jobs:
   deps:
     name: Dependencies
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       MIX_ENV: test
     strategy:
       matrix:
         include:
           - pair:
-              elixir: 1.12.3
-              otp: 24.3.4
+              elixir: 1.15.7
+              otp: 25.3
           - pair:
-              elixir: 1.14.3
-              otp: 25.3.2
+              elixir: 1.16.0
+              otp: 26.0
             lint: lint
     steps:
       - uses: styfle/cancel-workflow-action@0.11.0
@@ -61,18 +61,18 @@ jobs:
   static_code_analysis:
     name: Static Code Analysis
     needs: deps
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       MIX_ENV: test
     strategy:
       matrix:
         include:
           - pair:
-              elixir: 1.12.3
-              otp: 24.3.4
+              elixir: 1.15.7
+              otp: 25.3
           - pair:
-              elixir: 1.14.3
-              otp: 25.3.2
+              elixir: 1.16.0
+              otp: 26.0
             lint: lint
     steps:
       - uses: styfle/cancel-workflow-action@0.11.0
@@ -111,7 +111,7 @@ jobs:
 
   unit_tests:
     needs: deps
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       MIX_ENV: test
     strategy:
@@ -119,11 +119,11 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.12.3
-              otp: 24.3.4
+              elixir: 1.15.7
+              otp: 25.3
           - pair:
-              elixir: 1.14.3
-              otp: 25.3.2
+              elixir: 1.16.0
+              otp: 26.0
             lint: lint
     steps:
       - uses: styfle/cancel-workflow-action@0.11.0
