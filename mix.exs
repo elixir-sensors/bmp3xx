@@ -20,7 +20,7 @@ defmodule BMP3XX.MixProject do
         docs: :docs,
         "hex.publish": :docs,
         "hex.build": :docs
-      },
+      }
     ]
   end
 
@@ -89,5 +89,4 @@ defmodule BMP3XX.MixProject do
       skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
     ]
   end
-
 end
