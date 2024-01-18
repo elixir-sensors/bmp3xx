@@ -6,10 +6,10 @@ bus_address = 0x77
 
 Mix.install(
   [
-    {:circuits_i2c, github: "elixir-circuits/circuits_i2c", branch: "v2.0", override: true},
-    {:circuits_sim, github: "elixir-circuits/circuits_sim", branch: "main"},
-    {:kino, "~> 0.9.3"},
-    {:bmp3xx, "~> 0.1.5"}
+    {:bmp3xx, "~> 0.1.7"},
+    {:circuits_i2c, "~> 2.0"},
+    {:circuits_sim, github: "elixir-circuits/circuits_sim"},
+    {:kino, "~> 0.12.2"}
   ],
   config: [
     circuits_i2c: [default_backend: CircuitsSim.I2C.Backend],
