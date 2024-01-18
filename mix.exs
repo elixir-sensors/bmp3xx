@@ -1,8 +1,7 @@
 defmodule BMP3XX.MixProject do
   use Mix.Project
 
-  @version "0.1.6"
-  @description "Use Bosch environment sensors in Elixir"
+  @version "0.1.7"
   @source_url "https://github.com/mnishiguchi/bmp3xx"
 
   def project do
@@ -12,19 +11,16 @@ defmodule BMP3XX.MixProject do
       elixir: "~> 1.11",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps(Mix.env()),
+      deps: deps(),
+      dialyzer: dialyzer(),
       docs: docs(),
       package: package(),
-      description: @description,
-      dialyzer: [
-        flags: [:missing_return, :extra_return, :unmatched_returns, :error_handling, :underspecs]
-      ],
+      description: description(),
       preferred_cli_env: %{
         docs: :docs,
         "hex.publish": :docs,
         "hex.build": :docs
-      },
-      aliases: aliases()
+      }
     ]
   end
 
@@ -35,25 +31,30 @@ defmodule BMP3XX.MixProject do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
-  defp deps(env) when env in [:test, :dev] do
-    [
-      {:circuits_i2c, github: "elixir-circuits/circuits_i2c", branch: "v2.0", override: true},
-      {:circuits_sim, github: "elixir-circuits/circuits_sim"},
-      {:credo, "~> 1.7", runtime: false},
-      {:dialyxir, "~> 1.3", runtime: false}
-    ]
+  defp description do
+    "Use Bosch environment sensors in Elixir"
   end
 
-  defp deps(_env) do
+  # Run "mix help deps" to learn about dependencies.
+  defp deps do
     [
       {:circuits_i2c, "~> 2.0 or ~> 1.0 or ~> 0.3"},
+      {:circuits_sim, github: "elixir-circuits/circuits_sim", only: [:dev, :test]},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:credo_binary_patterns, "~> 0.2.2", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.29", only: :docs, runtime: false}
     ]
   end
 
   defp elixirc_paths(env) when env in [:test, :dev], do: ["lib", "test/support"]
   defp elixirc_paths(_env), do: ["lib"]
+
+  defp dialyzer do
+    [
+      flags: [:extra_return, :unmatched_returns, :error_handling, :underspecs]
+    ]
+  end
 
   defp package do
     %{
@@ -86,12 +87,6 @@ defmodule BMP3XX.MixProject do
       source_ref: "v#{@version}",
       source_url: @source_url,
       skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
-    ]
-  end
-
-  defp aliases do
-    [
-      lint: ["format", "deps.unlock --unused", "hex.outdated", "credo", "dialyzer"]
     ]
   end
 end
