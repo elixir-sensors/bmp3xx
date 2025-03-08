@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 Masatoshi Nishiguchi
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule BMP3XX.State do
   @moduledoc false
   # The internal state of the BMP3XX GenServer.

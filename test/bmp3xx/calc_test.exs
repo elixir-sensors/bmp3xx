@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Masatoshi Nishiguchi
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule BMP3XX.CalcTest do
   use ExUnit.Case, async: true
   alias BMP3XX.Calc

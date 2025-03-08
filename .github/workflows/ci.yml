@@ -1,14 +1,5 @@
 name: CI
-
-on:
-  push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
-
-permissions:
-  contents: read
-
+on: [push, pull_request]
 jobs:
   deps:
     name: Dependencies
@@ -18,35 +9,40 @@ jobs:
     strategy:
       matrix:
         include:
-          - pair:
-              elixir: 1.15.7
-              otp: 25.3
-          - pair:
-              elixir: 1.16.0
-              otp: 26.0
-            lint: lint
+          - elixir: 1.15
+            otp: 25
+          - elixir: 1.16
+            otp: 26
+          - elixir: 1.17
+            otp: 27
+          - elixir: 1.18
+            otp: 27
     steps:
-      - uses: styfle/cancel-workflow-action@0.11.0
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.11.0
         with:
           access_token: ${{ github.token }}
 
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - uses: erlef/setup-beam@v1
+      - name: Setup
+        uses: erlef/setup-beam@v1
         with:
-          otp-version: ${{matrix.pair.otp}}
-          elixir-version: ${{matrix.pair.elixir}}
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
 
-      - uses: actions/cache@v2
+      - name: Retrieve Cached Dependencies
+        uses: actions/cache@v3
         id: mix-cache
         with:
           path: |
             deps
             _build
             priv/plts
-          key: ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-${{ hashFiles('**/mix.lock') }}
+          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
 
       - name: Install Dependencies
         if: steps.mix-cache.outputs.cache-hit != 'true'
@@ -67,49 +63,46 @@ jobs:
     strategy:
       matrix:
         include:
-          - pair:
-              elixir: 1.15.7
-              otp: 25.3
-          - pair:
-              elixir: 1.16.0
-              otp: 26.0
-            lint: lint
+          - elixir: 1.18
+            otp: 27
     steps:
-      - uses: styfle/cancel-workflow-action@0.11.0
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.11.0
         with:
           access_token: ${{ github.token }}
 
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - uses: erlef/setup-beam@v1
+      - name: Setup
+        uses: erlef/setup-beam@v1
         with:
-          otp-version: ${{matrix.pair.otp}}
-          elixir-version: ${{matrix.pair.elixir}}
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
 
-      - uses: actions/cache@v2
+      - name: Retrieve Cached Dependencies
+        uses: actions/cache@v3
         id: mix-cache
         with:
           path: |
             deps
             _build
             priv/plts
-          key: ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-${{ hashFiles('**/mix.lock') }}
+          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
 
-      - run: mix format --check-formatted
-        if: ${{ matrix.lint }}
+      - name: Check Code Format
+        run: mix format --check-formatted
 
-      - run: mix deps.unlock --check-unused
-        if: ${{ matrix.lint }}
+      - name: Run Credo
+        run: mix credo
 
-      - run: mix credo
-        if: ${{ matrix.lint }}
-
-      - run: mix dialyzer --no-check --ignore-exit-status
-        if: ${{ matrix.lint }}
+      - name: Run Dialyzer
+        run: mix dialyzer --no-check --ignore-exit-status
 
   unit_tests:
+    name: Unit Tests
     needs: deps
     runs-on: ubuntu-22.04
     env:
@@ -118,34 +111,55 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - pair:
-              elixir: 1.15.7
-              otp: 25.3
-          - pair:
-              elixir: 1.16.0
-              otp: 26.0
-            lint: lint
+          - elixir: 1.15
+            otp: 25
+          - elixir: 1.16
+            otp: 26
+          - elixir: 1.17
+            otp: 27
+          - elixir: 1.18
+            otp: 27
     steps:
-      - uses: styfle/cancel-workflow-action@0.11.0
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.11.0
         with:
           access_token: ${{ github.token }}
 
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - uses: erlef/setup-beam@v1
+      - name: Setup
+        uses: erlef/setup-beam@v1
         with:
-          otp-version: ${{matrix.pair.otp}}
-          elixir-version: ${{matrix.pair.elixir}}
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
 
-      - uses: actions/cache@v2
+      - name: Retrieve Cached Dependencies
+        uses: actions/cache@v3
         id: mix-cache
         with:
           path: |
             deps
             _build
             priv/plts
-          key: ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-${{ hashFiles('**/mix.lock') }}
+          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
 
-      - run: mix test --trace --slowest 10
+      - name: Run test
+        run: mix test --warnings-as-errors --trace --slowest 10
+
+  reuse:
+    name: Check REUSE Compliance
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install REUSE tool
+        run: pip install reuse
+
+      - name: Run REUSE lint
+        run: reuse lint
