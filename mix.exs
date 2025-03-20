@@ -3,6 +3,7 @@ defmodule BMP3XX.MixProject do
 
   @version "0.1.7"
   @source_url "https://github.com/mnishiguchi/bmp3xx"
+  @reuse_compliance_url "https://api.reuse.software/info/github.com/elixir-sensors/bmp3xx"
 
   def project do
     [
@@ -63,12 +64,15 @@ defmodule BMP3XX.MixProject do
         "test",
         "mix.exs",
         "README.md",
-        "LICENSE",
-        "CHANGELOG.md"
+        "CHANGELOG*",
+        "LICENSES",
+        "NOTICE",
+        "REUSE.toml"
       ],
       licenses: ["Apache-2.0"],
       links: %{
         "GitHub" => @source_url,
+        "REUSE compliance" => @reuse_compliance_url,
         "BMP180 data sheet" => "https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf",
         "BMP280 data_sheet" => "https://cdn-shop.adafruit.com/datasheets/BST-BMP280-DS001-11.pdf",
         "BMP388 data_sheet" =>

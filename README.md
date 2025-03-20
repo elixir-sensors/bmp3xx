@@ -1,7 +1,9 @@
 # BMP3XX
 
 [![Hex version](https://img.shields.io/hexpm/v/bmp3xx.svg "Hex version")](https://hex.pm/packages/bmp3xx)
-[![CI](https://github.com/mnishiguchi/bmp3xx/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mnishiguchi/bmp3xx/actions/workflows/ci.yml)
+[![API docs](https://img.shields.io/hexpm/v/bmp3xx.svg?label=docs "API docs")](https://hexdocs.pm/bmp3xx)
+[![CI](https://github.com/mnishiguchi/bmp3xx/actions/workflows/ci.yml/badge.svg)](https://github.com/mnishiguchi/bmp3xx/actions/workflows/ci.yml)
+[![REUSE status](https://api.reuse.software/badge/github.com/elixir-sensors/bmp3xx)](https://api.reuse.software/info/github.com/elixir-sensors/bmp3xx)
 
 <!-- MODULEDOC -->
 Read temperature and pressure in Elixir from [Bosch environmental

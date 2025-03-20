@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Masatoshi Nishiguchi
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule BMP3XX.Transport do
   @moduledoc false
   # Just a thin wrapper around the Circuits.I2C module for our convenience
