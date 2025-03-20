@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.8
+
+### Improved
+
+- REUSE compliance
+- update dependencies in basic-usage notebook
+
 ## v0.1.7
 
 ### Added

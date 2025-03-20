@@ -1,7 +1,7 @@
 defmodule BMP3XX.MixProject do
   use Mix.Project
 
-  @version "0.1.7"
+  @version "0.1.8"
   @source_url "https://github.com/mnishiguchi/bmp3xx"
   @reuse_compliance_url "https://api.reuse.software/info/github.com/elixir-sensors/bmp3xx"
 
